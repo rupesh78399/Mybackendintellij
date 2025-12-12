@@ -1,0 +1,28 @@
+package com.example.Mybackendintellij;
+
+import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
+import java.util.List;
+
+@Repository
+public class UserRepository {
+
+    private List<UserModel> users = new ArrayList<>();
+    private int idCounter = 1;
+
+    public UserModel save(UserModel user) {
+        user.setId(idCounter++);
+        users.add(user);
+        return user;
+    }
+
+    public UserModel findByPhone(String phone) {
+        return users.stream().filter(u -> u.getPhone().equals(phone)).findFirst().orElse(null);
+    }
+
+    public UserModel login(String phone, String password) {
+        return users.stream()
+                .filter(u -> u.getPhone().equals(phone) && u.getPassword().equals(password))
+                .findFirst().orElse(null);
+    }
+}

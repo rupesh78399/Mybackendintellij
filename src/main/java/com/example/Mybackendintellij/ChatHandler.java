@@ -8,15 +8,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.List;
 
 @Component
 public class ChatHandler extends TextWebSocketHandler {
 
     private final MessageRepository messageRepository;
-
-    private Map<Integer, WebSocketSession> users = new ConcurrentHashMap<>();
+    private final Map<Integer, WebSocketSession> users = new ConcurrentHashMap<>();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public ChatHandler(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
@@ -25,30 +23,41 @@ public class ChatHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-        Integer userId = Integer.valueOf(session.getUri().getQuery().split("=")[1]);
-        users.put(userId, session);
+        Integer userId = Integer.valueOf(
+                session.getUri().getQuery().split("=")[1]
+        );
 
+        users.put(userId, session);
+        System.out.println("User connected: " + userId);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
-        //Convert JSON → MessageModel
-        ObjectMapper mapper = new ObjectMapper();
+        // Convert JSON → Java object
         ChatMessage incoming = mapper.readValue(message.getPayload(), ChatMessage.class);
 
-        // Save in DB
-        MessageStore messageStore = new MessageStore();
-        messageStore.setSenderId(incoming.getSenderId());
-        messageStore.setReceiverId(incoming.getReceiverId());
-        messageStore.setMessage(incoming.getMessage());
-        messageStore.setTimestamp(System.currentTimeMillis());
-        messageRepository.save(messageStore);
+        // Save to DB
+        MessageStore store = new MessageStore();
+        store.setSenderId(incoming.getSenderId());
+        store.setReceiverId(incoming.getReceiverId());
+        store.setMessage(incoming.getMessage());
+        store.setTimestamp(System.currentTimeMillis());
+        messageRepository.save(store);
 
-        // Send only to receiver
+        // Convert back to JSON
+        String json = mapper.writeValueAsString(incoming);
+
+        // Send to RECEIVER
         WebSocketSession receiverSession = users.get(incoming.getReceiverId());
         if (receiverSession != null && receiverSession.isOpen()) {
-            receiverSession.sendMessage(new TextMessage(incoming.getMessage()));
+            receiverSession.sendMessage(new TextMessage(json));
+        }
+
+        // Send to SENDER also → to update UI immediately
+        WebSocketSession senderSession = users.get(incoming.getSenderId());
+        if (senderSession != null && senderSession.isOpen()) {
+            senderSession.sendMessage(new TextMessage(json));
         }
     }
 }
