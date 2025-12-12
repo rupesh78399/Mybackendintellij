@@ -1,6 +1,7 @@
 package com.example.Mybackendintellij;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,21 +11,37 @@ public class AuthController {
     @Autowired
     private UserRepository userRepo;
 
+    // -------------------- SIGNUP --------------------
     @PostMapping("/signup")
-    public UserModel signup(@RequestBody UserModel user) {
+    public ResponseEntity<?> signup(@RequestBody UserModel user) {
+
+        if (user.getPhone() == null || user.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Phone and Password cannot be empty");
+        }
+
         UserModel exist = userRepo.findByPhone(user.getPhone());
         if (exist != null) {
-            throw new RuntimeException("User already exists");
+            return ResponseEntity.badRequest().body("User already exists");
         }
-        return userRepo.save(user);
+
+        UserModel saved = userRepo.save(user);
+        return ResponseEntity.ok(saved);
     }
 
+    // -------------------- LOGIN --------------------
     @PostMapping("/login")
-    public UserModel login(@RequestBody UserModel user) {
-        UserModel found = userRepo.login(user.getPhone(), user.getPassword());
-        if (found == null) {
-            throw new RuntimeException("Invalid credentials");
+    public ResponseEntity<?> login(@RequestBody UserModel loginRequest) {
+
+        if (loginRequest.getPhone() == null || loginRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Phone and Password are required");
         }
-        return found;
+
+        UserModel found = userRepo.login(loginRequest.getPhone(), loginRequest.getPassword());
+
+        if (found == null) {
+            return ResponseEntity.status(401).body("Invalid phone or password");
+        }
+
+        return ResponseEntity.ok(found);
     }
 }

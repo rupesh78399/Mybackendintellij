@@ -1,16 +1,23 @@
 package com.example.Mybackendintellij;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class UserModel {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String name;
     private String phone;
     private String password;
-    private String imagePath; // optional
+    private String imagePath;
 
     public UserModel() {}
 
-    public UserModel(int id, String name, String phone, String password, String imagePath) {
+    public UserModel(Integer id, String name, String phone, String password, String imagePath) {
         this.id = id;
         this.name = name;
         this.phone = phone;
@@ -19,8 +26,8 @@ public class UserModel {
     }
 
     // Getters & Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
