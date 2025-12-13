@@ -1,20 +1,25 @@
 package com.example.Mybackendintellij;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import com.example.Mybackendintellij.model.ChatMessage;
 
-@Entity
-@Data
-@Table(name = "message")
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MessageStore {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private int senderId;
-    private int receiverId;
+    private static final List<ChatMessage> messages = new ArrayList<>();
 
-    private String message;
+    public static void addMessage(ChatMessage message) {
+        messages.add(message);
+    }
 
-    private long timestamp;
+    public static List<ChatMessage> getConversation(int user1, int user2) {
+        return messages.stream()
+                .filter(m ->
+                        (m.getSenderId() == user1 && m.getReceiverId() == user2) ||
+                                (m.getSenderId() == user2 && m.getReceiverId() == user1)
+                )
+                .collect(Collectors.toList());
+    }
 }
