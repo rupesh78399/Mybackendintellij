@@ -17,7 +17,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+
+        // Register endpoint. Clients must connect to /ws/chat?userId=123
         registry.addHandler(chatHandler, "/chat")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns("*");   // for dev — restrict in production
     }
 }
