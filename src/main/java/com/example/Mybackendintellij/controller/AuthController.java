@@ -2,6 +2,7 @@ package com.example.Mybackendintellij.controller;
 
 import com.example.Mybackendintellij.model.UserModel;
 import com.example.Mybackendintellij.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    @Autowired
     private final UserRepository userRepo;
 
     public AuthController(UserRepository userRepo) {

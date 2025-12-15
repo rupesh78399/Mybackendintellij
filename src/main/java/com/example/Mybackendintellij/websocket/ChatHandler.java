@@ -11,12 +11,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Component
 public class ChatHandler extends TextWebSocketHandler {
 
     private final Map<Integer, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final MessageRepository messageRepository;
 
     public ChatHandler(MessageRepository messageRepository) {
