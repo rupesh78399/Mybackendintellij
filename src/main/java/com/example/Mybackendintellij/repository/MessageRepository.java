@@ -1,31 +1,26 @@
 package com.example.Mybackendintellij.repository;
 
 import com.example.Mybackendintellij.model.ChatMessage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Repository
-public class MessageRepository {
+public interface MessageRepository extends JpaRepository<ChatMessage, Long> {
 
-    private final List<ChatMessage> messages = new ArrayList<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
-
-    public ChatMessage save(ChatMessage message) {
-        message.setId(idGenerator.getAndIncrement());
-        messages.add(message);
-        return message;
-    }
-
-    public List<ChatMessage> getMessages(Integer senderId, Integer receiverId) {
-        return messages.stream()
-                .filter(m ->
-                        (m.getSenderId().equals(senderId) && m.getReceiverId().equals(receiverId)) ||
-                                (m.getSenderId().equals(receiverId) && m.getReceiverId().equals(senderId))
-                )
-                .collect(Collectors.toList());
-    }
+    @Query("""
+      SELECT m FROM ChatMessage m
+      WHERE (m.senderId = :u1 AND m.receiverId = :u2)
+         OR (m.senderId = :u2 AND m.receiverId = :u1)
+      ORDER BY m.sentAt ASC
+    """)
+    List<ChatMessage> findChat(
+            @Param("u1") Long user1,
+            @Param("u2") Long user2
+    );
+    Optional<ChatMessage> findByIdAndSenderId(Long id , Long senderId);
 }

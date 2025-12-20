@@ -4,6 +4,8 @@ import com.example.Mybackendintellij.dto.MessageDto;
 import com.example.Mybackendintellij.model.ChatMessage;
 import com.example.Mybackendintellij.repository.MessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -16,17 +18,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 @Component
 public class ChatHandler extends TextWebSocketHandler {
 
+    private static final Log log = LogFactory.getLog(ChatHandler.class);
     private final Map<Integer, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final MessageRepository messageRepository;
 
     public ChatHandler(MessageRepository messageRepository) {
+
         this.messageRepository = messageRepository;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         Integer userId = getUserId(session);
+        log.info("WS CONNECTED -> userId = " + userId);
         if (userId != null) {
             sessions.put(userId, session);
         }
@@ -40,8 +45,9 @@ public class ChatHandler extends TextWebSocketHandler {
         ChatMessage saved = messageRepository.save(
                 new ChatMessage(dto.getSenderId(), dto.getReceiverId(), dto.getContent(), Instant.now())
         );
+        ChatMessage chatMessage = saved;
 
-        String json = mapper.writeValueAsString(saved);
+        String json = mapper.writeValueAsString(chatMessage);
 
         WebSocketSession receiver = sessions.get(dto.getReceiverId());
         if (receiver != null && receiver.isOpen()) {

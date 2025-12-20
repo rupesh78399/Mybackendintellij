@@ -1,7 +1,9 @@
 package com.example.Mybackendintellij.controller;
 
+import com.example.Mybackendintellij.MessageService;
 import com.example.Mybackendintellij.model.ChatMessage;
 import com.example.Mybackendintellij.repository.MessageRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,16 +13,26 @@ import java.util.List;
 public class ChatController {
 
     private final MessageRepository messageRepository;
+    private final MessageService messageService;
 
-    public ChatController(MessageRepository messageRepository) {
+    public ChatController(MessageRepository messageRepository, MessageService messageService) {
         this.messageRepository = messageRepository;
+        this.messageService = messageService;
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMessage(@PathVariable Long id , @RequestParam Long userId) {
+        messageService.deleteMessage(id, userId);
+        return ResponseEntity.ok("Message deleted");
+
     }
 
     @GetMapping("/history")
-    public List<ChatMessage> getHistory(
-            @RequestParam Integer senderId,
-            @RequestParam Integer receiverId
+    public List<ChatMessage> getChatHistory(
+            @RequestParam("senderId") Long senderId,
+            @RequestParam("receiverId") Long receiverId
     ) {
-        return messageRepository.getMessages(senderId, receiverId);
+        System.out.println("HISTORY API HIT: " + senderId + " -> " + receiverId);
+        return messageRepository.findChat(senderId, receiverId);
     }
+
 }

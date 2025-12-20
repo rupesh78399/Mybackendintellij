@@ -23,7 +23,6 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(404).body("User not found");
         }
-
         return ResponseEntity.ok(user);
     }
 }
