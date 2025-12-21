@@ -22,6 +22,7 @@ public class ChatController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMessage(@PathVariable Long id , @RequestParam Long userId) {
         messageService.deleteMessage(id, userId);
+        System.out.println("🔥 DELETE CONTROLLER HIT");
         return ResponseEntity.ok("Message deleted");
 
     }
