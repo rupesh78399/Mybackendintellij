@@ -19,7 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 public class ChatHandler extends TextWebSocketHandler {
 
     private static final Log log = LogFactory.getLog(ChatHandler.class);
-    private final Map<Integer, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final MessageRepository messageRepository;
 
@@ -30,7 +30,7 @@ public class ChatHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        Integer userId = getUserId(session);
+        Long userId = getUserId(session);
         log.info("WS CONNECTED -> userId = " + userId);
         if (userId != null) {
             sessions.put(userId, session);
@@ -60,12 +60,12 @@ public class ChatHandler extends TextWebSocketHandler {
         }
     }
 
-    private Integer getUserId(WebSocketSession session) {
+    private Long getUserId(WebSocketSession session) {
         String query = session.getUri().getQuery();
         if (query == null) return null;
         for (String p : query.split("&")) {
             String[] kv = p.split("=");
-            if (kv[0].equals("userId")) return Integer.valueOf(kv[1]);
+            if (kv[0].equals("userId")) return Long.valueOf(kv[1]);
         }
         return null;
     }

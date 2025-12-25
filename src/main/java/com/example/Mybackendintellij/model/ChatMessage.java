@@ -12,17 +12,18 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer senderId;
-    private Integer receiverId;
+    private Long senderId;
+    private Long receiverId;
 
     @Column(columnDefinition = "TEXT")
     private String content;
     private Instant sentAt;
-    private boolean deleted;
+    @Column(name = "is_deleted")
+    private boolean deleted = false;
 
     public ChatMessage() {}
 
-    public ChatMessage(Integer senderId, Integer receiverId, String content, Instant sentAt) {
+    public ChatMessage(Long senderId, Long receiverId, String content, Instant sentAt) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
@@ -32,12 +33,12 @@ public class ChatMessage {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Integer getSenderId() { return senderId; }
-    public Integer getReceiverId() { return receiverId; }
+    public Long getSenderId() { return senderId; }
+    public Long getReceiverId() { return receiverId; }
     public String getContent() { return content; }
     public Instant getSentAt() { return sentAt; }
-    public void setSenderId(Integer senderId) { this.senderId = senderId; }
-    public void setReceiverId(Integer receiverId) { this.receiverId = receiverId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
+    public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
     public void setContent(String content) { this.content = content; }
     public void setSentAt(Instant sentAt) { this.sentAt = sentAt; }
     public boolean isDeleted() { return deleted; }

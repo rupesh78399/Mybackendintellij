@@ -2,17 +2,17 @@ package com.example.Mybackendintellij.dto;
 
 public class MessageDto {
 
-    private Integer senderId;
-    private Integer receiverId;
+    private Long senderId;
+    private Long receiverId;
     private String content;
 
     public MessageDto() {}
 
-    public Integer getSenderId() { return senderId; }
-    public void setSenderId(Integer senderId) { this.senderId = senderId; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
 
-    public Integer getReceiverId() { return receiverId; }
-    public void setReceiverId(Integer receiverId) { this.receiverId = receiverId; }
+    public Long getReceiverId() { return receiverId; }
+    public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
