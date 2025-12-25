@@ -11,19 +11,25 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class MessageService {
 
-    @Autowired
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
+
+    public MessageService(MessageRepository messageRepository, FcmService fcmService) {
+        this.messageRepository = messageRepository;
+    }
 
     public void deleteMessage(Long messageId, Long userId) {
 
-        ChatMessage message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new RuntimeException("Message not found"));
+        ChatMessage msg = messageRepository.findById(messageId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Message not found"));
 
-        if (!message.getSenderId().equals(userId)) {
-            throw new RuntimeException("You cannot delete this message");
+        // Optional safety check
+        if (!msg.getSenderId().equals(userId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "You can delete only your own messages");
         }
 
-        message.setDeleted(true);
-        // no need to call save explicitly
+        messageRepository.softDeleteById(messageId);
     }
 }
+

@@ -20,7 +20,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserModel user) {
         if (userRepo.findByPhone(user.getPhone()) != null) {
-            return ResponseEntity.badRequest().body("User already exists");
+            return ResponseEntity.badRequest().body("MyUser already exists");
         }
         return ResponseEntity.ok(userRepo.save(user));
     }

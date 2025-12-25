@@ -20,7 +20,6 @@ public class ChatMessage {
     private Instant sentAt;
     @Column(name = "is_deleted")
     private boolean deleted = false;
-
     public ChatMessage() {}
 
     public ChatMessage(Long senderId, Long receiverId, String content, Instant sentAt) {

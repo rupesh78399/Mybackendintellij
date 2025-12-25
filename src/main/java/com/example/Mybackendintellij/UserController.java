@@ -21,7 +21,7 @@ public class UserController {
         UserModel user = userRepository.findByPhone(phone);
 
         if (user == null) {
-            return ResponseEntity.status(404).body("User not found");
+            return ResponseEntity.status(404).body("MyUser not found");
         }
         return ResponseEntity.ok(user);
     }

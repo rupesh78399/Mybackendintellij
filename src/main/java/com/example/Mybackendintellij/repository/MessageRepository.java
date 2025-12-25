@@ -2,6 +2,7 @@ package com.example.Mybackendintellij.repository;
 
 import com.example.Mybackendintellij.model.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,10 @@ public interface MessageRepository extends JpaRepository<ChatMessage, Long> {
             @Param("u1") Long user1,
             @Param("u2") Long user2
     );
+
+    @Modifying
+    @Query("UPDATE ChatMessage m SET m.deleted = true WHERE m.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
     Optional<ChatMessage> findByIdAndSenderId(Long id , Long senderId);
     List<ChatMessage> findBySenderIdAndReceiverIdAndDeletedFalse(Long id, Long receiverId);
