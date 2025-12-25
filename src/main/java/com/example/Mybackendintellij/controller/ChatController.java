@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -23,7 +24,7 @@ public class ChatController {
     public ResponseEntity<?> deleteMessage(@PathVariable Long id , @RequestParam Long userId) {
         messageService.deleteMessage(id, userId);
         System.out.println("🔥 DELETE CONTROLLER HIT");
-        return ResponseEntity.ok("Message deleted");
+        return ResponseEntity.ok(Map.of("message" , "Message deleted"));
 
     }
 
