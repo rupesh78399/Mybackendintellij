@@ -35,7 +35,7 @@ public class AuthController {
         Mu.setFcmToken(null);
         userRepoMsg.save(Mu);
 
-        return ResponseEntity.ok(userRepo.save(user));
+        return ResponseEntity.ok(savedUser);
     }
 
     @PostMapping("/login")
