@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/notification")
 public class NotificationController {
@@ -35,7 +37,7 @@ public class NotificationController {
 
             System.out.println("✅ TOKEN SAVED");
 
-            return ResponseEntity.ok("FCM TOKEN SAVED");
+            return ResponseEntity.ok(Map.of("message","FCM TOKEN SAVED"));
         } catch (Exception e) {
             e.printStackTrace();   // 🔥 THIS IS CRITICAL
             throw e;
