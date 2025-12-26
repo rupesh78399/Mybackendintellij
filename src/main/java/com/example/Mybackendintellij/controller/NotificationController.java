@@ -22,13 +22,24 @@ public class NotificationController {
 
     @PostMapping("/save-token")
     public ResponseEntity<?> saveFcmToken(@RequestBody FcmTokenRequest request) {
+        try {
+            System.out.println("➡️ save-token HIT");
+            System.out.println("USER ID = " + request.userId);
+            System.out.println("TOKEN = " + request.fcmToken);
 
-        MyUser user =  userRepository.findById(request.userId)
-                .orElseThrow(() -> new RuntimeException("MyUser not found"));
+            MyUser user = userRepository.findById(request.userId)
+                    .orElseThrow(() -> new RuntimeException("MyUser not found"));
 
-        user.setFcmToken(request.fcmToken);
-        userRepository.save(user);
+            user.setFcmToken(request.fcmToken);
+            userRepository.save(user);
 
-        return ResponseEntity.ok("FCM TOKEN SAVED");
+            System.out.println("✅ TOKEN SAVED");
+
+            return ResponseEntity.ok("FCM TOKEN SAVED");
+        } catch (Exception e) {
+            e.printStackTrace();   // 🔥 THIS IS CRITICAL
+            throw e;
+        }
     }
+
 }
