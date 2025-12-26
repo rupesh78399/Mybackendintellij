@@ -26,8 +26,13 @@ public class AuthController {
         if (userRepo.findByPhone(user.getPhone()) != null) {
             return ResponseEntity.badRequest().body("MyUser already exists");
         }
+
+        UserModel savedUser = userRepo.save(user);
+
         MyUser Mu = new MyUser();
-        Mu.setId(user.getId());
+        Mu.setId(savedUser.getId());
+        Mu.setPhone(savedUser.getPhone());     // ✅ SAVE PHONE
+        Mu.setFcmToken(null);
         userRepoMsg.save(Mu);
 
         return ResponseEntity.ok(userRepo.save(user));
