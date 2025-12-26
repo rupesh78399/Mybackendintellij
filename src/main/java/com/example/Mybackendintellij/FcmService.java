@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,16 +18,20 @@ import java.util.List;
 public class FcmService {
 
     private static final String PROJECT_ID = "directmessa";
-
     private static final String FCM_URL =
             "https://fcm.googleapis.com/v1/projects/" + PROJECT_ID + "/messages:send";
 
     private GoogleCredentials getCredentials() throws IOException {
 
-        InputStream serviceAccount =
-                new FileInputStream("firebase-service-account.json");
+        String json = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
 
-        return GoogleCredentials.fromStream(serviceAccount)
+        if (json == null || json.isBlank()) {
+            throw new RuntimeException("❌ Firebase credentials not found in env");
+        }
+
+        InputStream stream = new ByteArrayInputStream(json.getBytes());
+
+        return GoogleCredentials.fromStream(stream)
                 .createScoped(List.of("https://www.googleapis.com/auth/firebase.messaging"));
     }
 
@@ -38,24 +43,26 @@ public class FcmService {
 
     public void sendNotification(String fcmToken, String title, String body) {
 
-        if (fcmToken == null || fcmToken.isBlank()) return;
+        if (fcmToken == null || fcmToken.isBlank()) {
+            System.out.println("❌ FCM token missing");
+            return;
+        }
 
         try {
             String accessToken = getAccessToken();
 
-            // ✅ DATA-ONLY PAYLOAD (VERY IMPORTANT)
             String payload = """
-        {
-          "message": {
-            "token": "%s",
-            "data": {
-              "title": "%s",
-              "body": "%s",
-              "type": "chat"
+            {
+              "message": {
+                "token": "%s",
+                "data": {
+                  "title": "%s",
+                  "body": "%s",
+                  "type": "chat"
+                }
+              }
             }
-          }
-        }
-        """.formatted(fcmToken, title, body);
+            """.formatted(fcmToken, title, body);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(FCM_URL))
@@ -68,29 +75,11 @@ public class FcmService {
                     HttpClient.newHttpClient()
                             .send(request, HttpResponse.BodyHandlers.ofString());
 
+            System.out.println("🔥 FCM STATUS = " + response.statusCode());
             System.out.println("🔥 FCM RESPONSE = " + response.body());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
-    @PostConstruct
-    public void testFirebaseFile() {
-        try {
-            GoogleCredentials credentials =
-                    GoogleCredentials.getApplicationDefault()
-                            .createScoped(List.of(
-                                    "https://www.googleapis.com/auth/firebase.messaging"));
-
-            credentials.refreshIfExpired();
-            System.out.println("✅ FIREBASE FILE FOUND AND READABLE");
-
-        } catch (Exception e) {
-            System.out.println("❌ FIREBASE FILE NOT FOUND OR INVALID");
-            e.printStackTrace();
-        }
-    }
-
 }
