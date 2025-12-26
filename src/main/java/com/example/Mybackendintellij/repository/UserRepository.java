@@ -10,7 +10,7 @@ import java.util.List;
 public class UserRepository {
 
     private final List<UserModel> users = new ArrayList<>();
-    private int idCounter = 1;
+    private Long idCounter = 1L;
 
     public UserModel save(UserModel user) {
         user.setId(idCounter++);

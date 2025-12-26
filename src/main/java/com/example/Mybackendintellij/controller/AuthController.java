@@ -1,6 +1,8 @@
 package com.example.Mybackendintellij.controller;
 
+import com.example.Mybackendintellij.model.MyUser;
 import com.example.Mybackendintellij.model.UserModel;
+import com.example.Mybackendintellij.repository.UserRepoMsg;
 import com.example.Mybackendintellij.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +14,11 @@ public class AuthController {
 
     @Autowired
     private final UserRepository userRepo;
+    private final UserRepoMsg userRepoMsg;
 
-    public AuthController(UserRepository userRepo) {
+    public AuthController(UserRepository userRepo, UserRepoMsg userRepoMsg) {
         this.userRepo = userRepo;
+        this.userRepoMsg = userRepoMsg;
     }
 
     @PostMapping("/signup")
@@ -22,6 +26,10 @@ public class AuthController {
         if (userRepo.findByPhone(user.getPhone()) != null) {
             return ResponseEntity.badRequest().body("MyUser already exists");
         }
+        MyUser Mu = new MyUser();
+        Mu.setId(user.getId());
+        userRepoMsg.save(Mu);
+
         return ResponseEntity.ok(userRepo.save(user));
     }
 

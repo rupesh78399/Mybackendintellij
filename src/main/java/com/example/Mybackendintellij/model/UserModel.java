@@ -2,7 +2,7 @@ package com.example.Mybackendintellij.model;
 
 public class UserModel {
 
-    private int id;
+    private Long id;
     private String name;
     private String phone;
     private String password;
@@ -10,7 +10,7 @@ public class UserModel {
 
     public UserModel() {}
 
-    public UserModel(int id, String name, String phone, String password, String imagePath) {
+    public UserModel(Long id, String name, String phone, String password, String imagePath) {
         this.id = id;
         this.name = name;
         this.phone = phone;
@@ -18,8 +18,8 @@ public class UserModel {
         this.imagePath = imagePath;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
