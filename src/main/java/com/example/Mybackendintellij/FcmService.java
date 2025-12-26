@@ -43,17 +43,19 @@ public class FcmService {
         try {
             String accessToken = getAccessToken();
 
+            // ✅ DATA-ONLY PAYLOAD (VERY IMPORTANT)
             String payload = """
-            {
-              "message": {
-                "token": "%s",
-                "notification": {
-                  "title": "%s",
-                  "body": "%s"
-                }
-              }
+        {
+          "message": {
+            "token": "%s",
+            "data": {
+              "title": "%s",
+              "body": "%s",
+              "type": "chat"
             }
-            """.formatted(fcmToken, title, body);
+          }
+        }
+        """.formatted(fcmToken, title, body);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(FCM_URL))
@@ -62,13 +64,17 @@ public class FcmService {
                     .POST(HttpRequest.BodyPublishers.ofString(payload))
                     .build();
 
-            HttpClient.newHttpClient()
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response =
+                    HttpClient.newHttpClient()
+                            .send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("🔥 FCM RESPONSE = " + response.body());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @PostConstruct
     public void testFirebaseFile() {
