@@ -91,6 +91,18 @@ public class ChatHandler extends TextWebSocketHandler {
             sender.sendMessage(new TextMessage(json));
         }
     }
+    @Override
+    public void afterConnectionClosed(
+            WebSocketSession session,
+            CloseStatus status
+    ) {
+        Long userId = getUserId(session);
+        if (userId != null) {
+            sessions.remove(userId);
+            log.info("❌ WS DISCONNECTED -> userId = " + userId);
+        }
+    }
+
 
 
     private Long getUserId(WebSocketSession session) {
