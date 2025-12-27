@@ -1,8 +1,11 @@
 package com.example.Mybackendintellij.websocket;
 
+import com.example.Mybackendintellij.FcmService;
 import com.example.Mybackendintellij.dto.MessageDto;
 import com.example.Mybackendintellij.model.ChatMessage;
+import com.example.Mybackendintellij.model.MyUser;
 import com.example.Mybackendintellij.repository.MessageRepository;
+import com.example.Mybackendintellij.repository.UserRepoMsg;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,10 +25,14 @@ public class ChatHandler extends TextWebSocketHandler {
     private final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final MessageRepository messageRepository;
+    private final UserRepoMsg userRepository;
+    private final FcmService fcmService;
 
-    public ChatHandler(MessageRepository messageRepository) {
+    public ChatHandler(MessageRepository messageRepository, UserRepoMsg userRepository, FcmService fcmService) {
 
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.fcmService = fcmService;
     }
 
     @Override
@@ -36,29 +43,55 @@ public class ChatHandler extends TextWebSocketHandler {
             sessions.put(userId, session);
         }
     }
-
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
         MessageDto dto = mapper.readValue(message.getPayload(), MessageDto.class);
 
         ChatMessage saved = messageRepository.save(
-                new ChatMessage(dto.getSenderId(), dto.getReceiverId(), dto.getContent(), Instant.now())
+                new ChatMessage(
+                        dto.getSenderId(),
+                        dto.getReceiverId(),
+                        dto.getContent(),
+                        Instant.now()
+                )
         );
-        ChatMessage chatMessage = saved;
 
-        String json = mapper.writeValueAsString(chatMessage);
+        String json = mapper.writeValueAsString(saved);
 
         WebSocketSession receiver = sessions.get(dto.getReceiverId());
+        WebSocketSession sender = sessions.get(dto.getSenderId());
+
+        // 1️⃣ SEND TO RECEIVER IF ONLINE
         if (receiver != null && receiver.isOpen()) {
             receiver.sendMessage(new TextMessage(json));
+            log.info("📨 Message delivered via WebSocket to receiver");
+        }
+        // 2️⃣ ELSE SEND FCM NOTIFICATION
+        else {
+            log.info("📴 Receiver offline → sending FCM notification");
+
+            MyUser receiverUser = userRepository
+                    .findById(dto.getReceiverId())
+                    .orElse(null);
+
+            if (receiverUser != null && receiverUser.getFcmToken() != null) {
+                fcmService.sendNotification(
+                        receiverUser.getFcmToken(),
+                        "New Message",
+                        dto.getContent()
+                );
+            } else {
+                log.warn("⚠️ Receiver FCM token missing");
+            }
         }
 
-        WebSocketSession sender = sessions.get(dto.getSenderId());
+        // 3️⃣ SEND BACK TO SENDER
         if (sender != null && sender.isOpen()) {
             sender.sendMessage(new TextMessage(json));
         }
     }
+
 
     private Long getUserId(WebSocketSession session) {
         String query = session.getUri().getQuery();
