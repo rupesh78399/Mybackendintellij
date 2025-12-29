@@ -18,6 +18,14 @@ public class UserRepository {
         return user;
     }
 
+    public UserModel findById(Long id) {
+        return users.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+
     public UserModel findByPhone(String phone) {
         return users.stream()
                 .filter(u -> u.getPhone().equals(phone))
