@@ -7,6 +7,12 @@ import com.example.Mybackendintellij.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,12 +27,31 @@ public class AuthController {
         this.userRepoMsg = userRepoMsg;
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserModel user) {
-        if (userRepo.findByPhone(user.getPhone()) != null) {
+    @PostMapping(value = "/signup", consumes = "multipart/form-data")
+    public ResponseEntity<?> signup( @RequestParam("name") String name,
+                                     @RequestParam("phone") String phone,
+                                     @RequestParam("password") String password,
+                                     @RequestParam("image") MultipartFile image) throws Exception {
+        if (userRepo.findByPhone(phone) != null) {
             return ResponseEntity.badRequest().body("MyUser already exists");
         }
 
+        // Save image on server
+        String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+        Path path = Paths.get("uploads");
+        if(!Files.exists(path)){
+            Files.createDirectories(path);
+        }
+        Path filePath = path.resolve(fileName);
+        Files.copy(image.getInputStream() , filePath , StandardCopyOption.REPLACE_EXISTING);
+
+        String imageUrl = "/uploads/" + fileName;
+
+        UserModel user = new UserModel();
+        user.setName(name);
+        user.setPhone(phone);
+        user.setPassword(password);
+        user.setImagePath(imageUrl);
         UserModel savedUser = userRepo.save(user);
 
         MyUser Mu = new MyUser();
