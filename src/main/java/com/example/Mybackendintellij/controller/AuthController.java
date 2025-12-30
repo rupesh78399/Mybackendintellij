@@ -38,7 +38,7 @@ public class AuthController {
 
         // Save image on server
         String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-        Path path = Paths.get("uploads");
+        Path path = Paths.get("/tmp/uploads");
         if(!Files.exists(path)){
             Files.createDirectories(path);
         }
