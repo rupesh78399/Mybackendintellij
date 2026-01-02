@@ -52,12 +52,12 @@ public class AuthController {
 
         String imageUrl = "/uploads/" + fileName;
 
-        UserModel user = new UserModel();
+        UserEntity user = new UserEntity();
         user.setName(name);
         user.setPhone(phone);
         user.setPassword(password);
         user.setImagePath(imageUrl);
-        UserModel savedUser = userRepo.save(user);
+        UserEntity savedUser = userRepo.save(user);
 
         MyUser Mu = new MyUser();
         Mu.setId(savedUser.getId());
@@ -86,8 +86,8 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserModel user) {
-        UserModel found = userRepo.login(user.getPhone(), user.getPassword());
+    public ResponseEntity<?> login(@RequestBody UserEntity user) {
+        UserEntity found = userRepo.login(user.getPhone(), user.getPassword());
         if (found == null) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }

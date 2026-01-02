@@ -1,6 +1,7 @@
 package com.example.Mybackendintellij.repository;
 
 import com.example.Mybackendintellij.model.MyUser;
+import com.example.Mybackendintellij.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -4,6 +4,7 @@ import com.example.Mybackendintellij.FcmService;
 import com.example.Mybackendintellij.dto.MessageDto;
 import com.example.Mybackendintellij.model.ChatMessage;
 import com.example.Mybackendintellij.model.MyUser;
+import com.example.Mybackendintellij.model.UserEntity;
 import com.example.Mybackendintellij.model.UserModel;
 import com.example.Mybackendintellij.repository.MessageRepository;
 import com.example.Mybackendintellij.repository.UserRepoMsg;
@@ -80,7 +81,7 @@ public class ChatHandler extends TextWebSocketHandler {
         );
 
         // Fetch sender profile (image)
-        UserModel senderUser =
+        UserEntity senderUser =
                 userRepository.findById(incoming.getSenderId());
 
         // Build outgoing message

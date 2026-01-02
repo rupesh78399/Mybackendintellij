@@ -1,5 +1,6 @@
 package com.example.Mybackendintellij;
 
+import com.example.Mybackendintellij.model.UserEntity;
 import com.example.Mybackendintellij.model.UserModel;
 import com.example.Mybackendintellij.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class UserController {
     @GetMapping("/by-phone/{phone}")
     public ResponseEntity<?> getUserByPhone(@PathVariable String phone) {
 
-        UserModel user = userRepository.findByPhone(phone);
+        UserEntity user = userRepository.findByPhone(phone);
 
         if (user == null) {
             return ResponseEntity.status(404).body("MyUser not found");
