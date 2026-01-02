@@ -1,5 +1,6 @@
 package com.example.Mybackendintellij.controller;
 
+import com.cloudinary.Cloudinary;
 import com.example.Mybackendintellij.dto.UserDto;
 import com.example.Mybackendintellij.model.MyUser;
 import com.example.Mybackendintellij.model.UserEntity;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,6 +27,10 @@ public class AuthController {
     private final UserRepository userRepo;
     private final UserRepoMsg userRepoMsg;
     private final userRepoforSetImage UserRepoforSetImage;
+
+    @Autowired
+    private Cloudinary cloudinary;
+
 
     public AuthController(UserRepository userRepo, UserRepoMsg userRepoMsg, userRepoforSetImage userRepoforSetImage) {
         this.userRepo = userRepo;
@@ -41,16 +47,14 @@ public class AuthController {
             return ResponseEntity.badRequest().body("MyUser already exists");
         }
 
-        // Save image on server
-        String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-        Path path = Paths.get("/tmp/uploads");
-        if(!Files.exists(path)){
-            Files.createDirectories(path);
-        }
-        Path filePath = path.resolve(fileName);
-        Files.copy(image.getInputStream() , filePath , StandardCopyOption.REPLACE_EXISTING);
-
-        String imageUrl = "/uploads/" + fileName;
+        Map uploadResult = cloudinary.uploader().upload(
+                image.getBytes(),
+                Map.of(
+                        "folder", "profile_images",
+                        "resource_type", "image"
+                )
+        );
+        String imageUrl = uploadResult.get("secure_url").toString();
 
         UserEntity user = new UserEntity();
         user.setName(name);
