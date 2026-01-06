@@ -1,8 +1,7 @@
 package com.example.Mybackendintellij;
 
 import com.example.Mybackendintellij.model.UserEntity;
-import com.example.Mybackendintellij.model.UserModel;
-import com.example.Mybackendintellij.repository.UserRepository;
+import com.example.Mybackendintellij.repository.userRepoforSetImage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final userRepoforSetImage userRepository;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(userRepoforSetImage userRepository) {
         this.userRepository = userRepository;
     }
 

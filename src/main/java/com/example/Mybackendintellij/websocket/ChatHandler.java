@@ -5,10 +5,9 @@ import com.example.Mybackendintellij.dto.MessageDto;
 import com.example.Mybackendintellij.model.ChatMessage;
 import com.example.Mybackendintellij.model.MyUser;
 import com.example.Mybackendintellij.model.UserEntity;
-import com.example.Mybackendintellij.model.UserModel;
 import com.example.Mybackendintellij.repository.MessageRepository;
 import com.example.Mybackendintellij.repository.UserRepoMsg;
-import com.example.Mybackendintellij.repository.UserRepository;
+import com.example.Mybackendintellij.repository.userRepoforSetImage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.logging.Log;
@@ -20,7 +19,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 @Component
 public class ChatHandler extends TextWebSocketHandler {
 
@@ -31,19 +29,19 @@ public class ChatHandler extends TextWebSocketHandler {
             new ObjectMapper().registerModule(new JavaTimeModule());
 
     private final MessageRepository messageRepository;
-    private final UserRepoMsg userRepoMsg;        // FCM / MyUser
-    private final UserRepository userRepository; // UserModel (profile)
+    private final UserRepoMsg userRepoMsg;              // FCM / MyUser
+    private final userRepoforSetImage userRepo;         // UserEntity (profile)
     private final FcmService fcmService;
 
     public ChatHandler(
             MessageRepository messageRepository,
             UserRepoMsg userRepoMsg,
-            UserRepository userRepository,
+            userRepoforSetImage userRepo,
             FcmService fcmService
     ) {
         this.messageRepository = messageRepository;
         this.userRepoMsg = userRepoMsg;
-        this.userRepository = userRepository;
+        this.userRepo = userRepo;
         this.fcmService = fcmService;
     }
 
@@ -80,9 +78,10 @@ public class ChatHandler extends TextWebSocketHandler {
                 )
         );
 
-        // Fetch sender profile (image)
-        UserEntity senderUser =
-                userRepository.findById(incoming.getSenderId());
+        // ✅ Fetch sender profile from USER table
+        UserEntity senderUser = userRepo
+                .findById(incoming.getSenderId())
+                .orElse(null);
 
         // Build outgoing message
         MessageDto outgoing = new MessageDto();
@@ -92,6 +91,7 @@ public class ChatHandler extends TextWebSocketHandler {
         outgoing.setContent(saved.getContent());
         outgoing.setSentAt(saved.getSentAt());
 
+        // ✅ Attach sender image
         if (senderUser != null) {
             outgoing.setSenderImagePath(senderUser.getImagePath());
         }
