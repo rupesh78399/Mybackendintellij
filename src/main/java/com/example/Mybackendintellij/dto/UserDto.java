@@ -2,6 +2,7 @@ package com.example.Mybackendintellij.dto;
 
 public class UserDto {
     private Long id;
+    private String Username;
     private String name;
     private String phone;
     private String imagePath;
@@ -36,5 +37,13 @@ public class UserDto {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getUsername() {
+        return Username;
+    }
+
+    public void setUsername(String username) {
+        Username = username;
     }
 }
