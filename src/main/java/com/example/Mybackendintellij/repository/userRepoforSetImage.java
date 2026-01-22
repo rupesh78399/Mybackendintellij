@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface userRepoforSetImage extends JpaRepository<UserEntity, Long> {
     UserEntity findByPhone(String phone);
-    List<UserEntity> findByUsernameContainingIgnoreCase(String username);
+    List<UserEntity> findByUsernameContainingIgnoreCase(String name);
 }

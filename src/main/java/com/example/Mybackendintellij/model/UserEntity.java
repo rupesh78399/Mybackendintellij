@@ -10,8 +10,9 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String Username;   // 👈 ADD THIS
+
+    @Column(nullable = false, unique = true)
+    private String Username;
 
     private String name;
     private String phone;
