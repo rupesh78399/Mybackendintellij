@@ -10,10 +10,6 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @Column(nullable = false, unique = true)
-    private String Username;
-
     private String name;
     private String phone;
     private String password;
@@ -63,11 +59,4 @@ public class UserEntity {
         this.imagePath = imagePath;
     }
 
-    public String getUsername() {
-        return Username;
-    }
-
-    public void setUsername(String username) {
-        Username = username;
-    }
 }
