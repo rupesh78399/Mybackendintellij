@@ -29,6 +29,7 @@ public class UserSearchController {
                     UserDto dto = new UserDto();
                     dto.setId(user.getId());
                     dto.setName(user.getName());
+                    dto.setUsername(user.getUsername()); // ✅ ADD THIS
                     dto.setImagePath(user.getImagePath());
                     return dto;
                 })

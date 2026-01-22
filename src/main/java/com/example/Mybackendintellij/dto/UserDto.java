@@ -4,6 +4,7 @@ public class UserDto {
     private Long id;
     private String name;
     private String phone;
+    private String username;
     private String imagePath;
 
     public Long getId() {
@@ -38,4 +39,11 @@ public class UserDto {
         this.imagePath = imagePath;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
